@@ -297,7 +297,15 @@ class TestGrafo(unittest.TestCase):
         self.g_l3_m[2][2] = 1
         self.g_l3_m[3][3] = 1
 
+        # Matriz grafo desconexo
 
+        self.g_d_m = self.constroi_matriz(self.g_d)
+        self.g_d_m[0][1] = 1
+
+        # Matriz grafo com ciclo e laço
+
+        self.g_e_m = self.constroi_matriz(self.g_e)
+        self.g_e_m[][] = 1
 
         self.g_e_m = self.constroi_matriz(self.g_e)
         for i in range(0, len(self.g_e_m)):
@@ -446,14 +454,13 @@ class TestGrafo(unittest.TestCase):
         self.assertEqual(self.g_e.arestas_sobre_vertice('D'), {'5', '6', '7', '8'})
 
     def test_warshall(self):
-        #self.assertEqual(self.g_p.warshall(), self.g_p_m)
-        #self.assertEqual(self.g_e.warshall(), self.g_e_m)
-        #self.assertEqual(self.g_p_sem_paralelas.warshall(), self.g_p_m2)
-        #self.assertEqual(self.g_c.warshall(), self.g_c_m)
-        #self.assertEqual(self.g_l3.warshall(), self.g_l3_m)
+        self.assertEqual(self.g_p.warshall(), self.g_p_m)
+        self.assertEqual(self.g_e.warshall(), self.g_e_m)
+        self.assertEqual(self.g_p_sem_paralelas.warshall(), self.g_p_m2)
+        self.assertEqual(self.g_c.warshall(), self.g_c_m)
+        self.assertEqual(self.g_l3.warshall(), self.g_l3_m)
         self.assertEqual(self.g_p5.warshall(), self.g_p_m3)
-
-
+        self.assertEqual(self.g_d.warshall(), self.g_d_m)
 
     def test_dijkstra(self):
         pass
