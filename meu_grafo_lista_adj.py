@@ -34,6 +34,7 @@ class MeuGrafo(GrafoListaAdjacencia):
         Verifica se existe algum laço no grafo.
         :return: Um valor booleano que indica se existe algum laço.
         '''
+        print(self.arestas)
         for aresta in self.arestas.values():
             if aresta.v1 == aresta.v2:
                 return True

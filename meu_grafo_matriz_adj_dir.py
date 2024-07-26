@@ -10,14 +10,42 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
         Onde X, Z e W são vértices no grafo que não tem uma aresta entre eles.
         :return: Uma lista com os pares de vértices não adjacentes
         '''
-        pass
+
+        nao_adjacentes = set()
+        vertices = [str(vertice) for vertice in self.vertices]
+
+        for vertice in vertices:
+            adjacentes = set()
+            for str_aresta in sorted(self.arestas_sobre_vertice(vertice)):
+                aresta = self.get_aresta(str_aresta)
+                v1 = str(aresta.v1)
+                v2 = str(aresta.v2)
+
+                if v2 == vertice:
+                    continue
+
+                adjacentes.add(v1 if v1 != vertice else v2)
+
+            for vert in vertices:
+                if vert not in adjacentes and vert != vertice:
+                    nao_adjacentes.add(f'{vertice}-{vert}')
+        return nao_adjacentes
 
     def ha_laco(self):
         '''
         Verifica se existe algum laço no grafo.
         :return: Um valor booleano que indica se existe algum laço.
         '''
-        pass
+
+        vertices = [str(vertice) for vertice in self.vertices]
+        str_arestas = [
+            aresta for vertice in vertices for aresta in self.arestas_sobre_vertice(vertice)]
+
+        for str_aresta in str_arestas:
+            aresta = self.get_aresta(str_aresta)
+            if aresta.v1 == aresta.v2:
+                return True
+        return False
 
     def grau(self, V=''):
         '''
@@ -26,14 +54,32 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
         :return: Um valor inteiro que indica o grau do vértice
         :raises: VerticeInvalidoException se o vértice não existe no grafo
         '''
-        pass
+
+        if not self.existe_rotulo_vertice(V):
+            raise VerticeInvalidoError
+
+        arestas = self.arestas_sobre_vertice(V)
+        cont = 0
+
+        for rotulo_aresta in arestas:
+            aresta = self.get_aresta(rotulo_aresta)
+            if str(aresta.v1) == V:
+                cont += 1
+            if str(aresta.v2) == V:
+                cont += 1
+        return cont
 
     def ha_paralelas(self):
         '''
         Verifica se há arestas paralelas no grafo
         :return: Um valor booleano que indica se existem arestas paralelas no grafo.
         '''
-        pass
+
+        for row in self.arestas:
+            for obj in row:
+                if len(obj) > 1:
+                    return True
+        return False
 
     def arestas_sobre_vertice(self, V):
         '''
@@ -42,14 +88,27 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
         :return: Uma lista os rótulos das arestas que incidem sobre o vértice
         :raises: VerticeInvalidoException se o vértice não existe no grafo
         '''
-        pass
+
+        if not self.existe_rotulo_vertice(V):
+            raise VerticeInvalidoError
+
+        arestas = set()
+        for linha in self.arestas:
+            for dicionario in linha:
+                for aresta in dicionario.values():
+                    if str(aresta.v1) == V or str(aresta.v2) == V:
+                        arestas.add(aresta.rotulo)
+        return arestas
 
     def eh_completo(self):
         '''
         Verifica se o grafo é completo.
         :return: Um valor booleano que indica se o grafo é completo
         '''
-        pass
+        if len(self.vertices_nao_adjacentes()) > 0 or self.ha_laco() or \
+                self.ha_paralelas():
+            return False
+        return True
 
     def warshall(self):
         '''
@@ -59,7 +118,6 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
 
         e = [[1 if obj else 0 for obj in row] for row in self.arestas]
         qnt_verts = len(self.vertices)
-        
 
         for i in range(qnt_verts):
             for j in range(qnt_verts):
@@ -67,16 +125,3 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
                     for k in range(qnt_verts):
                         e[j][k] = max(e[j][k], e[i][k])
         return e
-
-
-if __name__ == '__main__':
-    # grafo1 = MeuGrafo()
-    # grafo1.adiciona_vertice('A')
-    # grafo1.adiciona_vertice('B')
-    # grafo1.adiciona_vertice('C')
-    # grafo1.adiciona_vertice('D')
-    # grafo1.adiciona_aresta('a1', 'A', 'B')
-    # grafo1.adiciona_aresta('a2', 'B', 'C')
-    # grafo1.adiciona_aresta('a3', 'C', 'D')
-    # grafo1.warshall()
-    ...
