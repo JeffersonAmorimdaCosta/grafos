@@ -154,12 +154,12 @@ class MeuGrafo(GrafoListaAdjacencia):
         #     return False
 
         novo_grafo.adiciona_vertice(V)
-        prox_vert: str = list()
+        prox_vert = list()
 
         prox_vert.append(V)
         while prox_vert:
             vert_atual = prox_vert.pop(0)
-            arestas_vertice: str = sorted(
+            arestas_vertice = sorted(
                 list(self.arestas_sobre_vertice(vert_atual)))
 
             for aresta in arestas_vertice:

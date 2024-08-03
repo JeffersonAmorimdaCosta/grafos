@@ -6,7 +6,8 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
 
     def vertices_nao_adjacentes(self):
         '''
-        Provê uma lista de vértices não adjacentes no grafo. A lista terá o seguinte formato: [X-Z, X-W, ...]
+        Provê uma lista de vértices não adjacentes no grafo. A lista terá o
+        seguinte formato: [X-Z, X-W, ...]
         Onde X, Z e W são vértices no grafo que não tem uma aresta entre eles.
         :return: Uma lista com os pares de vértices não adjacentes
         '''
@@ -39,7 +40,8 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
 
         vertices = [str(vertice) for vertice in self.vertices]
         str_arestas = [
-            aresta for vertice in vertices for aresta in self.arestas_sobre_vertice(vertice)]
+            aresta for vertice in vertices for aresta in
+            self.arestas_sobre_vertice(vertice)]
 
         for str_aresta in str_arestas:
             aresta = self.get_aresta(str_aresta)
@@ -72,7 +74,8 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
     def ha_paralelas(self):
         '''
         Verifica se há arestas paralelas no grafo
-        :return: Um valor booleano que indica se existem arestas paralelas no grafo.
+        :return: Um valor booleano que indica se existem arestas paralelas no
+        grafo.
         '''
 
         for row in self.arestas:
@@ -83,7 +86,8 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
 
     def arestas_sobre_vertice(self, V):
         '''
-        Provê uma lista que contém os rótulos das arestas que incidem sobre o vértice passado como parâmetro
+        Provê uma lista que contém os rótulos das arestas que incidem sobre o
+        vértice passado como parâmetro
         :param V: O vértice a ser analisado
         :return: Uma lista os rótulos das arestas que incidem sobre o vértice
         :raises: VerticeInvalidoException se o vértice não existe no grafo
@@ -100,6 +104,26 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
                         arestas.add(aresta.rotulo)
         return arestas
 
+    def arestas_sobre_vertice_dir(self, V):
+        '''
+        Provê uma lista que contém os rótulos das arestas direcionados que saem
+        do vértice passado como parâmetro.
+        :param V: O vértice a ser analisado
+        :return: Uma lista os rótulos das arestas que incidem sobre o vértice
+        :raises: VerticeInvalidoException se o vértice não existe no grafo
+        '''
+
+        if not self.existe_rotulo_vertice(V):
+            raise VerticeInvalidoError
+
+        arestas = set()
+        for linha in self.arestas:
+            for dicionario in linha:
+                for aresta in dicionario.values():
+                    if str(aresta.v1) == V:
+                        arestas.add(aresta.rotulo)
+        return arestas
+
     def eh_completo(self):
         '''
         Verifica se o grafo é completo.
@@ -113,7 +137,8 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
     def warshall(self):
         '''
         Provê a matriz de alcançabilidade de Warshall do grafo
-        :return: Uma lista de listas que representa a matriz de alcançabilidade de Warshall associada ao grafo
+        :return: Uma lista de listas que representa a matriz de alcançabilidade
+        de Warshall associada ao grafo
         '''
 
         e = [[1 if obj else 0 for obj in row] for row in self.arestas]
@@ -125,3 +150,76 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
                     for k in range(qnt_verts):
                         e[j][k] = max(e[j][k], e[i][k])
         return e
+
+    def dijkstra(self, u: str, v: str) -> list[str]:  # type: ignore
+        """
+        Encontra o menor caminho entre o vértice u e v.
+        :param u: Primeiro vértice do caminho.
+        :param v: último vértice do caminho.
+        :return : Uma lista com a ordem dos vértices do menor caminho.
+        :raises: VerticeInvalidoException se os vértices não existirem no grafo
+        """
+
+        if not self.existe_rotulo_vertice(u) or not self.existe_rotulo_vertice(v):
+            raise VerticeInvalidoError
+
+        def get_beta(v: str): return vertices[v]['beta']
+        def get_phi(v: str): return vertices[v]['phi']
+        def get_pi(v: str): return vertices[v]['pi']
+
+        vertices: dict = {}
+
+        # Definindo os valores iniciais para beta, phi e pi
+
+        for vertice in self.vertices:
+            str_vertice: str = str(vertice)
+
+            if str_vertice == u:
+                vertices.update(
+                    {str_vertice: {'beta': 0.0, 'phi': 1, 'pi': None}})
+            else:
+                vertices.update({str_vertice: {'beta': float('inf'), 'phi': 0,
+                                               'pi': None}})
+
+        # Definindo w como u
+        w = u
+        vertices_nao_visitados: set[str] = {str(vert) for vert in
+                                            self.vertices}
+        while w != v:
+            vertices_nao_visitados.remove(w)
+
+            # Definindo os betas dos vértices adjacentes a w
+            arestas: list[str] = sorted(self.arestas_sobre_vertice_dir(w))
+
+            for aresta in arestas:
+                obj_aresta = self.get_aresta(aresta)
+                v_adjacente = str(obj_aresta.v2)
+
+                if get_beta(v_adjacente) > get_beta(w) + obj_aresta.peso:
+                    vertices[v_adjacente]['beta'] = obj_aresta.peso + \
+                        get_beta(w)
+                    vertices[v_adjacente]['pi'] = w
+
+            # Escolhendo o próximo w com base no menor beta e phi = 0
+            menor: str | None = None
+            for vertice in vertices_nao_visitados:
+                if not get_phi(vertice) and \
+                        (menor is None or get_beta(vertice) < get_beta(menor)):
+                    menor = vertice
+
+            # Definindo o próximo w
+            if menor is not None:
+                w = menor
+                vertices[w]['phi'] = 1
+
+        # Criando o caminho pegando a partir do último vértice
+        atual = w
+        caminho: list[str] = []
+        while atual != u:
+            caminho.append(atual)
+            atual = get_pi(atual)
+
+        caminho.append(u)
+        caminho.reverse()
+        return caminho
+
