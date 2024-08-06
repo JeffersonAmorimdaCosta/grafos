@@ -163,6 +163,8 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
         if not self.existe_rotulo_vertice(u) or not self.existe_rotulo_vertice(v):
             raise VerticeInvalidoError
 
+        vertices: dict = {}
+
         def get_beta(v: str):
             return vertices[v]['beta']
 
@@ -171,8 +173,6 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
 
         def get_pi(v: str):
             return vertices[v]['pi']
-
-        vertices: dict = {}
 
         # Definindo os valores iniciais para beta, phi e pi
 
@@ -229,3 +229,104 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
         caminho.append(u)
         caminho.reverse()
         return caminho
+
+    def bellman_ford(self, u: str, v: str) -> list[str] | bool:
+        """
+        Encontra o menor caminho entre o vértice u e v.
+        :param u: Primeiro vértice do caminho.
+        :param v: último vértice do caminho.
+        :return : Uma lista com a ordem dos vértices do menor caminho.
+        :raises: VerticeInvalidoException se os vértices não existirem no grafo
+        """
+
+        if not self.existe_rotulo_vertice(u) or not self.existe_rotulo_vertice(v):
+            raise VerticeInvalidoError
+
+        vertices: dict = {}
+
+        def get_beta(v: str):
+            return vertices[v]['beta']
+
+        def get_phi(v: str):
+            return vertices[v]['phi']
+
+        def get_pi(v: str):
+            return vertices[v]['pi']
+
+        # Definindo os valores iniciais para beta, phi e pi
+
+        for vertice in self.vertices:
+            str_vertice: str = str(vertice)
+
+            if str_vertice == u:
+                vertices.update(
+                    {str_vertice: {'beta': 0.0, 'phi': 1, 'pi': None}})
+            else:
+                vertices.update({str_vertice: {'beta': float('inf'), 'phi': 0,
+                                               'pi': None}})
+
+        # Definindo w como u
+        w = u
+        vertices_nao_visitados: set[str] = {str(vert) for vert in
+                                            self.vertices}
+        while True:
+            if w == v:
+                vertices_nao_visitados.remove(w)
+                break
+            vertices_nao_visitados.remove(w)
+
+            # Definindo os betas dos vértices adjacentes a w
+            arestas: list[str] = sorted(self.arestas_sobre_vertice_dir(w))
+
+            for aresta in arestas:
+                obj_aresta = self.get_aresta(aresta)
+                v_adjacente = str(obj_aresta.v2)
+
+                if get_beta(v_adjacente) > get_beta(w) + obj_aresta.peso:
+                    vertices[v_adjacente]['beta'] = obj_aresta.peso + \
+                        get_beta(w)
+                    vertices[v_adjacente]['pi'] = w
+
+            # Escolhendo o próximo w com base no menor beta e phi = 0
+            menor: str | None = None
+            for vertice in vertices_nao_visitados:
+                if not get_phi(vertice) and get_pi(vertice) is not None and \
+                        (menor is None or get_beta(vertice) < get_beta(menor)):
+                    menor = vertice
+
+            # Definindo o próximo w
+            if menor is not None:
+                w = menor
+                vertices[w]['phi'] = 1
+            else:
+                return False
+
+        if not vertices_nao_visitados:
+            for vert in [str(vertice) for vertice in self.vertices]:
+                for aresta in self.arestas_sobre_vertice_dir(vert):
+                    obj_aresta = self.get_aresta(aresta)
+                    if get_beta(vert) + obj_aresta.peso < \
+                            get_beta(str(obj_aresta.v2)):
+                        return False
+
+        # Criando o caminho pegando a partir do último vértice
+        atual = w
+        caminho: list[str] = []
+        while atual != u:
+            caminho.append(atual)
+            atual = get_pi(atual)
+
+        caminho.append(u)
+        caminho.reverse()
+        return caminho
+
+
+if __name__ == '__main__':
+    grafo = MeuGrafo()
+    grafo.adiciona_vertice('A')
+    grafo.adiciona_vertice('B')
+    grafo.adiciona_vertice('C')
+    grafo.adiciona_aresta('a1', 'A', 'B', 3)
+    grafo.adiciona_aresta('a2', 'B', 'A', -5)
+    grafo.adiciona_aresta('a3', 'B', 'C', 3)
+    print(grafo.bellman_ford('A', 'C'))
