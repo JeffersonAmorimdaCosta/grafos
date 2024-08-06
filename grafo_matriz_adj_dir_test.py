@@ -133,6 +133,18 @@ class TestGrafo(unittest.TestCase):
         self.g_c.adiciona_aresta('a5', 'P', 'C')
         self.g_c.adiciona_aresta('a6', 'P', 'E')
 
+        self.g_c_dij = MeuGrafo()
+        self.g_c_dij.adiciona_vertice("J")
+        self.g_c_dij.adiciona_vertice("C")
+        self.g_c_dij.adiciona_vertice("E")
+        self.g_c_dij.adiciona_vertice("P")
+        self.g_c_dij.adiciona_aresta('a1', 'J', 'C', 9)
+        self.g_c_dij.adiciona_aresta('a2', 'J', 'E', 1)
+        self.g_c_dij.adiciona_aresta('a3', 'J', 'P', 2)
+        self.g_c_dij.adiciona_aresta('a4', 'E', 'C', 9)
+        self.g_c_dij.adiciona_aresta('a5', 'P', 'C', 8)
+        self.g_c_dij.adiciona_aresta('a6', 'P', 'E', 1)
+
         self.g_c2 = MeuGrafo()
         self.g_c2.adiciona_vertice("Nina")
         self.g_c2.adiciona_vertice("Maria")
@@ -159,6 +171,24 @@ class TestGrafo(unittest.TestCase):
         self.g_c4.adiciona_aresta('a11', 'P', 'C')
         self.g_c4.adiciona_aresta('a12', 'P', 'E')
 
+        self.g_c4_dij = MeuGrafo()
+        self.g_c4_dij.adiciona_vertice("J")
+        self.g_c4_dij.adiciona_vertice("C")
+        self.g_c4_dij.adiciona_vertice("E")
+        self.g_c4_dij.adiciona_vertice("P")
+        self.g_c4_dij.adiciona_aresta('a1', 'J', 'C', 1)
+        self.g_c4_dij.adiciona_aresta('a2', 'J', 'E', 10)
+        self.g_c4_dij.adiciona_aresta('a3', 'J', 'P', 10)
+        self.g_c4_dij.adiciona_aresta('a4', 'C', 'J', 10)
+        self.g_c4_dij.adiciona_aresta('a5', 'C', 'E', 1)
+        self.g_c4_dij.adiciona_aresta('a6', 'C', 'P', 10)
+        self.g_c4_dij.adiciona_aresta('a7', 'E', 'J', 10)
+        self.g_c4_dij.adiciona_aresta('a8', 'E', 'C', 10)
+        self.g_c4_dij.adiciona_aresta('a9', 'E', 'P', 1)
+        self.g_c4_dij.adiciona_aresta('a10', 'P', 'J', 10)
+        self.g_c4_dij.adiciona_aresta('a11', 'P', 'C', 10)
+        self.g_c4_dij.adiciona_aresta('a12', 'P', 'E', 10)
+
         # Grafos com laco
         self.g_l1 = MeuGrafo()
         self.g_l1.adiciona_vertice("A")
@@ -168,6 +198,15 @@ class TestGrafo(unittest.TestCase):
         self.g_l1.adiciona_aresta('a1', 'A', 'A')
         self.g_l1.adiciona_aresta('a2', 'A', 'B')
         self.g_l1.adiciona_aresta('a3', 'A', 'A')
+
+        self.g_l1_dij = MeuGrafo()
+        self.g_l1_dij.adiciona_vertice("A")
+        self.g_l1_dij.adiciona_vertice("B")
+        self.g_l1_dij.adiciona_vertice("C")
+        self.g_l1_dij.adiciona_vertice("D")
+        self.g_l1_dij.adiciona_aresta('a1', 'A', 'A', 1)
+        self.g_l1_dij.adiciona_aresta('a2', 'A', 'B', 10)
+        self.g_l1_dij.adiciona_aresta('a3', 'A', 'A', 1)
 
         self.g_l2 = MeuGrafo()
         self.g_l2.adiciona_vertice("A")
@@ -205,6 +244,13 @@ class TestGrafo(unittest.TestCase):
         self.g_d.adiciona_vertice("C")
         self.g_d.adiciona_vertice("D")
         self.g_d.adiciona_aresta('asd', 'A', 'B')
+
+        self.g_d_dij = MeuGrafo()
+        self.g_d_dij.adiciona_vertice("A")
+        self.g_d_dij.adiciona_vertice("B")
+        self.g_d_dij.adiciona_vertice("C")
+        self.g_d_dij.adiciona_vertice("D")
+        self.g_d_dij.adiciona_aresta('asd', 'A', 'B')
 
         # Grafo com ciclos e laços
         self.g_e = MeuGrafo()
@@ -279,6 +325,9 @@ class TestGrafo(unittest.TestCase):
         self.g_c_c.adiciona_aresta('a4', 'B', 'C')
         self.g_c_c.adiciona_aresta('a5', 'C', 'A')
         self.g_c_c.adiciona_aresta('a6', 'C', 'B')
+
+        self.g_u = MeuGrafo()
+        self.g_u.adiciona_vertice('A')
 
         # Grafo drone
         self.grafo_drone = MeuGrafo()
@@ -518,17 +567,6 @@ class TestGrafo(unittest.TestCase):
         self.g_r_m[4][1] = 1
         self.g_r_m[4][4] = 1
 
-        # Grafos desconexos
-        self.g_dijkstra = MeuGrafo()
-        self.g_dijkstra.adiciona_vertice("A")
-        self.g_dijkstra.adiciona_vertice("B")
-        self.g_dijkstra.adiciona_vertice("C")
-        self.g_dijkstra.adiciona_vertice("D")
-        self.g_dijkstra.adiciona_aresta('1', 'A', 'B', 1)
-        self.g_dijkstra.adiciona_aresta('2', 'A', 'C', 1)
-        self.g_dijkstra.adiciona_aresta('3', 'B', 'D', 1)
-        self.g_dijkstra.adiciona_aresta('2', 'C', 'D', 2)
-
     def constroi_matriz(self, g: MeuGrafo):
         ordem = len(g._vertices)
         m = list()
@@ -690,6 +728,13 @@ class TestGrafo(unittest.TestCase):
         with self.assertRaises(VerticeInvalidoError):
             self.assertEqual(self.grafo_drone.dijkstra('NN', 'A'), [])
             self.assertEqual(self.dijkstra_1.dijkstra('Y', 'D'), [])
+
+        self.assertEqual(self.g_c_dij.dijkstra('J', 'C'), ['J', 'C'])
+        self.assertEqual(self.g_l1_dij.dijkstra('A', 'B'), ['A', 'B'])
+        self.assertFalse(self.g_d_dij.dijkstra('A', 'D'))
+        self.assertEqual(self.g_u.dijkstra('A', 'A'), ['A'])
+        self.assertEqual(self.g_c4_dij.dijkstra(
+            'J', 'P'), ['J', 'C', 'E', 'P'])
 
 
 if __name__ == '__main__':

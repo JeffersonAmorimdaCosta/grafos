@@ -151,7 +151,7 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
                         e[j][k] = max(e[j][k], e[i][k])
         return e
 
-    def dijkstra(self, u: str, v: str) -> list[str]:  # type: ignore
+    def dijkstra(self, u: str, v: str) -> list[str] | bool:
         """
         Encontra o menor caminho entre o vértice u e v.
         :param u: Primeiro vértice do caminho.
@@ -163,9 +163,14 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
         if not self.existe_rotulo_vertice(u) or not self.existe_rotulo_vertice(v):
             raise VerticeInvalidoError
 
-        def get_beta(v: str): return vertices[v]['beta']
-        def get_phi(v: str): return vertices[v]['phi']
-        def get_pi(v: str): return vertices[v]['pi']
+        def get_beta(v: str):
+            return vertices[v]['beta']
+
+        def get_phi(v: str):
+            return vertices[v]['phi']
+
+        def get_pi(v: str):
+            return vertices[v]['pi']
 
         vertices: dict = {}
 
@@ -203,7 +208,7 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
             # Escolhendo o próximo w com base no menor beta e phi = 0
             menor: str | None = None
             for vertice in vertices_nao_visitados:
-                if not get_phi(vertice) and \
+                if not get_phi(vertice) and get_pi(vertice) is not None and \
                         (menor is None or get_beta(vertice) < get_beta(menor)):
                     menor = vertice
 
@@ -211,6 +216,8 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
             if menor is not None:
                 w = menor
                 vertices[w]['phi'] = 1
+            else:
+                return False
 
         # Criando o caminho pegando a partir do último vértice
         atual = w
@@ -222,4 +229,3 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
         caminho.append(u)
         caminho.reverse()
         return caminho
-
