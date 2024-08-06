@@ -156,7 +156,8 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
         Encontra o menor caminho entre o vértice u e v.
         :param u: Primeiro vértice do caminho.
         :param v: último vértice do caminho.
-        :return : Uma lista com a ordem dos vértices do menor caminho.
+        :return : Uma lista com a ordem dos vértices do menor caminho ou False
+        se o caminho não existir.
         :raises: VerticeInvalidoException se os vértices não existirem no grafo
         """
 
@@ -235,7 +236,8 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
         Encontra o menor caminho entre o vértice u e v.
         :param u: Primeiro vértice do caminho.
         :param v: último vértice do caminho.
-        :return : Uma lista com a ordem dos vértices do menor caminho.
+        :return : Uma lista com a ordem dos vértices do menor caminho ou False
+        se o caminho não existir ou se houver ciclos negativos.
         :raises: VerticeInvalidoException se os vértices não existirem no grafo
         """
 
@@ -301,6 +303,7 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
             else:
                 return False
 
+        # Verificando se existem ciclos negativos
         if not vertices_nao_visitados:
             for vert in [str(vertice) for vertice in self.vertices]:
                 for aresta in self.arestas_sobre_vertice_dir(vert):
@@ -319,14 +322,3 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
         caminho.append(u)
         caminho.reverse()
         return caminho
-
-
-if __name__ == '__main__':
-    grafo = MeuGrafo()
-    grafo.adiciona_vertice('A')
-    grafo.adiciona_vertice('B')
-    grafo.adiciona_vertice('C')
-    grafo.adiciona_aresta('a1', 'A', 'B', 3)
-    grafo.adiciona_aresta('a2', 'B', 'A', -5)
-    grafo.adiciona_aresta('a3', 'B', 'C', 3)
-    print(grafo.bellman_ford('A', 'C'))
