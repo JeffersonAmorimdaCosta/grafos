@@ -129,6 +129,7 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
         Verifica se o grafo é completo.
         :return: Um valor booleano que indica se o grafo é completo
         '''
+
         if len(self.vertices_nao_adjacentes()) > 0 or self.ha_laco() or \
                 self.ha_paralelas():
             return False
@@ -249,14 +250,10 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
         def get_beta(v: str):
             return vertices[v]['beta']
 
-        def get_phi(v: str):
-            return vertices[v]['phi']
-
         def get_pi(v: str):
             return vertices[v]['pi']
 
         # Definindo os valores iniciais para beta, phi e pi
-
         for vertice in self.vertices:
             str_vertice: str = str(vertice)
 
@@ -267,58 +264,41 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
                 vertices.update({str_vertice: {'beta': float('inf'), 'phi': 0,
                                                'pi': None}})
 
-        # Definindo w como u
-        w = u
-        vertices_nao_visitados: set[str] = {str(vert) for vert in
-                                            self.vertices}
-        while True:
-            if w == v:
-                vertices_nao_visitados.remove(w)
-                break
-            vertices_nao_visitados.remove(w)
+        qnt_vertices: int = len(self.vertices)
+        vertices_alterados: set[str] = set()
+        vertices_alterados.add(u)
 
-            # Definindo os betas dos vértices adjacentes a w
-            arestas: list[str] = sorted(self.arestas_sobre_vertice_dir(w))
+        for _ in range(qnt_vertices):
+            ultimos_vertices: set[str] = set()
 
-            for aresta in arestas:
-                obj_aresta = self.get_aresta(aresta)
-                v_adjacente = str(obj_aresta.v2)
+            for vert in vertices_alterados:
+                arestas: list[str] = sorted(
+                    list(self.arestas_sobre_vertice_dir(vert)))
 
-                if get_beta(v_adjacente) > get_beta(w) + obj_aresta.peso:
-                    vertices[v_adjacente]['beta'] = obj_aresta.peso + \
-                        get_beta(w)
-                    vertices[v_adjacente]['pi'] = w
-
-            # Escolhendo o próximo w com base no menor beta e phi = 0
-            menor: str | None = None
-            for vertice in vertices_nao_visitados:
-                if not get_phi(vertice) and get_pi(vertice) is not None and \
-                        (menor is None or get_beta(vertice) < get_beta(menor)):
-                    menor = vertice
-
-            # Definindo o próximo w
-            if menor is not None:
-                w = menor
-                vertices[w]['phi'] = 1
-            else:
-                return False
-
-        # Verificando se existem ciclos negativos
-        if not vertices_nao_visitados:
-            for vert in [str(vertice) for vertice in self.vertices]:
-                for aresta in self.arestas_sobre_vertice_dir(vert):
+                for aresta in arestas:
                     obj_aresta = self.get_aresta(aresta)
-                    if get_beta(vert) + obj_aresta.peso < \
-                            get_beta(str(obj_aresta.v2)):
-                        return False
+                    vert_adjacente = str(obj_aresta.v2)
 
-        # Criando o caminho pegando a partir do último vértice
-        atual = w
-        caminho: list[str] = []
-        while atual != u:
-            caminho.append(atual)
-            atual = get_pi(atual)
+                    novo_beta = get_beta(vert) + obj_aresta.peso
 
-        caminho.append(u)
-        caminho.reverse()
-        return caminho
+                    if get_beta(vert_adjacente) > novo_beta:
+                        vertices[vert_adjacente]['beta'] = novo_beta
+                        vertices[vert_adjacente]['pi'] = vert
+
+                        ultimos_vertices.add(vert_adjacente)
+
+            if not ultimos_vertices:
+                # Criando o caminho pegando a partir do último vértice
+                atual = v
+                caminho: list[str] = []
+
+                while atual != u:
+                    caminho.append(atual)
+                    atual = get_pi(atual)
+
+                caminho.append(u)
+                caminho.reverse()
+                return caminho
+            vertices_alterados = ultimos_vertices
+
+        return False

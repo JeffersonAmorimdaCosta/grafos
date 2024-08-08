@@ -77,7 +77,7 @@ class MeuGrafo(GrafoListaAdjacencia):
                     return True
         return False
 
-    def arestas_sobre_vertice(self, V):
+    def arestas_sobre_vertice(self, V) -> set[str]:
         '''
         Provê uma lista que contém os rótulos das arestas que incidem sobre 
         o vértice passado como parâmetro
@@ -89,7 +89,7 @@ class MeuGrafo(GrafoListaAdjacencia):
         if not self.existe_rotulo_vertice(V):
             raise VerticeInvalidoError
 
-        lista: str = set()
+        lista: set[str] = set()
         for aresta in self.arestas.values():
             if (aresta.v1.rotulo == V) or (aresta.v2.rotulo == V):
                 lista.add(aresta.rotulo)
@@ -182,7 +182,7 @@ class MeuGrafo(GrafoListaAdjacencia):
 
     def ha_ciclo(self):
         if (len(self.vertices) <= 2) and not (self.ha_laco()) and not \
-                (self.ha_paralelas()) or (not len(self.arestas)):
+                (self.ha_paralelas()) or (not self.arestas):
             return False
 
         vertices_original = sorted([str(ver) for ver in self.vertices])
@@ -194,7 +194,7 @@ class MeuGrafo(GrafoListaAdjacencia):
 
         # Função recursiva que percorre o grafo
         def percorrer(raiz, encontrado):
-            arestas_vertice: str = sorted(
+            arestas_vertice: list[str] = sorted(
                 list(self.arestas_sobre_vertice(raiz)))
             # Lista com os vértices que incidem na raiz atual
 
@@ -248,7 +248,7 @@ class MeuGrafo(GrafoListaAdjacencia):
 
         def percorrer(raiz, tamanho):
             nonlocal contador, vertice_raiz
-            arestas_vertice: str = sorted(
+            arestas_vertice: list[str] = sorted(
                 list(self.arestas_sobre_vertice(raiz)))
             # Lista com os vértices que incidem na raiz atual
 
@@ -285,23 +285,11 @@ class MeuGrafo(GrafoListaAdjacencia):
                     contador -= 1
             return contador
 
-        resultado = percorrer(vertice_raiz, n)
+        percorrer(vertice_raiz, n)
         return caminho_n if caminho_n else False
 
     def conexo(self):
-        vertices_original = self.vertices
         raiz = str(self.vertices[0])
         grafo_dfs = self.dfs(raiz)
 
         return False if not grafo_dfs else True
-
-
-if __name__ == '__main__':
-    grafo1 = MeuGrafo()
-    grafo1.adiciona_vertice('A')
-    grafo1.adiciona_vertice('B')
-    grafo1.adiciona_vertice('C')
-    grafo1.adiciona_aresta('a1', 'A', 'A')
-    grafo1.adiciona_aresta('a2', 'A', 'B')
-    grafo1.adiciona_aresta('a3', 'A', 'C')
-    print(grafo1.conexo())
