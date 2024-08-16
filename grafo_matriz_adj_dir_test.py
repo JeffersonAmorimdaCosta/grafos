@@ -903,6 +903,7 @@ class TestGrafo(unittest.TestCase):
         self.assertEqual(self.grafo_sem_ciclo_negativo.bellman_ford('A', 'D'), ['A', 'D'])
         self.assertFalse(self.g_b_f_1.bellman_ford('A', 'C'))
         self.assertFalse(self.g_b_f_2.bellman_ford('A', 'C'))
+        self.assertFalse(self.g_d.bellman_ford('A', 'D'))
 
 
 if __name__ == '__main__':

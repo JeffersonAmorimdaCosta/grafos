@@ -293,6 +293,8 @@ class MeuGrafo(GrafoMatrizAdjacenciaDirecionado):
                 caminho: list[str] = []
 
                 while atual != u:
+                    if atual is None:
+                        return False
                     caminho.append(atual)
                     atual = get_pi(atual)
 
